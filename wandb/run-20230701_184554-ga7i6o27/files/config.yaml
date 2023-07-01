@@ -1,0 +1,135 @@
+wandb_version: 1
+
+num_layers:
+  desc: null
+  value: 10
+dim_hidden:
+  desc: null
+  value: 512
+w0:
+  desc: null
+  value: 50.0
+modulate_scale:
+  desc: null
+  value: 0
+modulate_shift:
+  desc: null
+  value: 1
+use_latent:
+  desc: null
+  value: 1
+latent_dim:
+  desc: null
+  value: 384
+modulation_net_dim_hidden:
+  desc: null
+  value: 64
+modulation_net_num_layers:
+  desc: null
+  value: 1
+seed:
+  desc: null
+  value: -1
+outer_lr:
+  desc: null
+  value: 3.0e-06
+inner_lr:
+  desc: null
+  value: 0.01
+inner_steps:
+  desc: null
+  value: 3
+batch_size:
+  desc: null
+  value: 64
+num_epochs:
+  desc: null
+  value: 500
+train_dataset:
+  desc: null
+  value: cifar10
+test_dataset:
+  desc: null
+  value: cifar10
+num_workers:
+  desc: null
+  value: 1
+gradient_checkpointing:
+  desc: null
+  value: 0
+num_validation_points:
+  desc: null
+  value: -1
+validate_every:
+  desc: null
+  value: 20
+validation_inner_steps:
+  desc: null
+  value:
+  - 3
+patch_shape:
+  desc: null
+  value:
+  - -1
+subsample_num_points:
+  desc: null
+  value: -1
+do_sampling:
+  desc: null
+  value: 1
+do_bootstrapping:
+  desc: null
+  value: 1
+inner_step_boot:
+  desc: null
+  value: 3
+inner_lr_boot:
+  desc: null
+  value: 0.01
+data_ratio:
+  desc: null
+  value: 0.5
+lam:
+  desc: null
+  value: 1.0
+use_wandb:
+  desc: null
+  value: 1
+wandb_project_name:
+  desc: null
+  value: cpp_gradncp
+wandb_entity:
+  desc: null
+  value: mburdorf
+wandb_job_type:
+  desc: null
+  value: null
+device:
+  desc: null
+  value: cuda
+_wandb:
+  desc: null
+  value:
+    python_version: 3.10.12
+    cli_version: 0.15.4
+    framework: torch
+    is_jupyter_run: false
+    is_kaggle_kernel: false
+    start_time: 1688237155.013537
+    t:
+      1:
+      - 1
+      - 41
+      - 55
+      2:
+      - 1
+      - 41
+      - 55
+      3:
+      - 3
+      - 16
+      - 23
+      4: 3.10.12
+      5: 0.15.4
+      8:
+      - 5

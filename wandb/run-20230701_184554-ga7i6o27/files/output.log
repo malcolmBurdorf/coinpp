@@ -1,0 +1,97 @@
+ModulatedSiren(
+  (net): Sequential(
+    (0): SirenLayer(
+      (linear): Linear(in_features=2, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (1): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (2): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (3): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (4): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (5): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (6): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (7): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+    (8): SirenLayer(
+      (linear): Linear(in_features=512, out_features=512, bias=True)
+      (activation): Sine()
+    )
+  )
+  (last_layer): SirenLayer(
+    (linear): Linear(in_features=512, out_features=3, bias=True)
+    (activation): Sine()
+  )
+  (modulation_net): LatentToModulation(
+    (net): Linear(in_features=384, out_features=4608, bias=True)
+  )
+)
+Namespace(num_layers=10, dim_hidden=512, w0=50.0, modulate_scale=0, modulate_shift=1, use_latent=1, latent_dim=384, modulation_net_dim_hidden=64, modulation_net_num_layers=1, seed=-1, outer_lr=3e-06, inner_lr=0.01, inner_steps=3, batch_size=64, num_epochs=500, train_dataset='cifar10', test_dataset='cifar10', num_workers=1, gradient_checkpointing=0, num_validation_points=-1, validate_every=20, validation_inner_steps=[3], patch_shape=[-1], subsample_num_points=-1, do_sampling=1, do_bootstrapping=1, inner_step_boot=3, inner_lr_boot=0.01, data_ratio=0.5, lam=1.0, use_wandb=1, wandb_project_name='cpp_gradncp', wandb_entity='mburdorf', wandb_job_type=None, device=device(type='cuda'))
+Epoch 1:
+Step 1, Loss 0.185, PSNR 12.285
+Step 2, Loss 0.166, PSNR 12.946
+Step 3, Loss 0.195, PSNR 12.667
+Step 4, Loss 0.193, PSNR 12.929
+Step 5, Loss 0.188, PSNR 12.936
+Step 6, Loss 0.207, PSNR 12.858
+Step 7, Loss 0.195, PSNR 13.870
+Step 8, Loss 0.216, PSNR 13.567
+Step 9, Loss 0.212, PSNR 13.980
+Step 10, Loss 0.254, PSNR 13.868
+Step 11, Loss 0.239, PSNR 13.601
+Step 12, Loss 0.284, PSNR 13.681
+Step 13, Loss 0.316, PSNR 13.363
+Step 14, Loss 0.347, PSNR 14.534
+Step 15, Loss 0.378, PSNR 13.622
+Step 16, Loss 0.415, PSNR 13.996
+Step 17, Loss 0.375, PSNR 13.883
+Step 18, Loss 0.468, PSNR 13.602
+Step 19, Loss 0.443, PSNR 13.617
+Step 20, Loss 0.466, PSNR 13.372
+Validation, Step 20:
+Inner steps 3, Loss 0.045, PSNR 14.013
+Step 21, Loss 0.387, PSNR 13.905
+Step 22, Loss 0.449, PSNR 13.852
+Step 23, Loss 0.462, PSNR 13.766
+Step 24, Loss 0.472, PSNR 13.698
+Step 25, Loss 0.521, PSNR 14.166
+Step 26, Loss 0.420, PSNR 13.380
+Step 27, Loss 0.465, PSNR 14.086
+Step 28, Loss 0.537, PSNR 13.562
+Step 29, Loss 0.480, PSNR 14.186
+Step 30, Loss 0.493, PSNR 13.289
+Step 31, Loss 0.507, PSNR 13.736
+Step 32, Loss 0.596, PSNR 13.992
+Step 33, Loss 0.521, PSNR 14.070
+Step 34, Loss 0.416, PSNR 14.514
+Step 35, Loss 0.507, PSNR 14.048
+Step 36, Loss 0.495, PSNR 14.145
+Traceback (most recent call last):
+  File "/content/drive/MyDrive/DLLab/my_coinpp_gradncp/main.py", line 310, in <module>
+    main(args)
+  File "/content/drive/MyDrive/DLLab/my_coinpp_gradncp/main.py", line 302, in main
+    trainer.train_epoch()
+  File "/content/drive/MyDrive/DLLab/my_coinpp_gradncp/coinpp/training.py", line 90, in train_epoch
+    outputs = metalearning.outer_step(
+  File "/content/drive/MyDrive/DLLab/my_coinpp_gradncp/coinpp/metalearning.py", line 258, in outer_step
+    "psnr": losses.mse2psnr(per_example_loss).mean().item(),
+KeyboardInterrupt

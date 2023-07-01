@@ -17,6 +17,7 @@ def inner_loop(
     inner_steps,
     inner_lr,
     is_train=False,
+    is_test=True,
     gradient_checkpointing=False,
     do_sampling=False,
     do_bootstrapping=False,
@@ -44,9 +45,19 @@ def inner_loop(
     if do_bootstrapping:
       coordinates_boot = coordinates
       features_boot = features
+    else:
+      coordinates_boot = None
+      features_boot = None
+
+    if is_test:
+      coordinates_test = coordinates
+      features_test = features
+    else:
+      coordinates_test = None
+      features_test = None
 
     # Perform GradNCP sampling 
-    if do_sampling == True:
+    if do_sampling:
         
         #gradncp samples the coordinates and also returns the sampling index (as in GradNCP code)
         sampled_coordinates, sampled_index = gradncp.gradncp_sample(features, func_rep, data_ratio)
@@ -86,14 +97,17 @@ def inner_loop(
                 features,
                 inner_lr,
                 is_train,
+                is_test,
                 gradient_checkpointing,
+                coordinates_test,
+                features_test
             )
     
     # Perform bootstrapping
     if do_bootstrapping:
         # copying the fitted modulations for bootstrapping
         # .detach().clone() allows for the computation path to not be copied
-        fitted_modulations_boot = fitted_modulations.clone().detach().requires_grad_()
+        fitted_modulations_boot = fitted_modulations.detach().clone().requires_grad_()
 
         for step in range(inner_steps_boot):
 
@@ -104,7 +118,10 @@ def inner_loop(
                 features_boot,
                 inner_lr_boot,
                 is_train=False,
+                is_test=False,
                 gradient_checkpointing=False,
+                coordinates_test=None,
+                features_test=None
             )
             
         return fitted_modulations, fitted_modulations_boot
@@ -118,7 +135,10 @@ def inner_loop_step(
     features,
     inner_lr,
     is_train=False,
+    is_test=True,
     gradient_checkpointing=False,
+    coordinates_test=None,
+    features_test=None
 ):
     """Performs a single inner loop step."""
     detach = not torch.is_grad_enabled() and gradient_checkpointing
@@ -138,8 +158,34 @@ def inner_loop_step(
             modulations,
             create_graph=is_train and not detach,
         )[0]
+
+
+    #gradient rescaling (only at test time)
+    grads_scale = 1
+    
+    if is_test:
+      subsample_grad = grad
+
+      with torch.enable_grad():
+          features_recon = func_rep.modulated_forward(coordinates_test, modulations)
+          loss = losses.mse_fn(features_recon, features_test)* batch_size
+
+          grad = torch.autograd.grad(
+              loss,
+              modulations,
+              create_graph=is_train and not detach,
+              allow_unused=True
+          )[0]
+          subsample_grad_norm= torch.norm(
+                  subsample_grad.data.view(batch_size, -1), p=2, dim=1, keepdim=True
+              )
+          grads_norm = torch.norm(
+                  grad.data.view(batch_size, -1), p=2, dim=1, keepdim=True
+              )
+          grads_scale = subsample_grad_norm / (grads_norm + 1e-16)
+
     # Perform single gradient descent step
-    return modulations - inner_lr * grad
+    return modulations - inner_lr * grad * grads_scale 
 
 
 def outer_step(
@@ -149,6 +195,7 @@ def outer_step(
     inner_steps,
     inner_lr,
     is_train=False,
+    is_test=True,
     return_reconstructions=False,
     gradient_checkpointing=False,
     do_sampling=False,
@@ -181,6 +228,7 @@ def outer_step(
         inner_steps,
         inner_lr,
         is_train,
+        is_test,
         gradient_checkpointing,
         do_sampling,
         do_bootstrapping,
@@ -203,8 +251,6 @@ def outer_step(
     # Compute bootstrapping loss and add it to loss over pruned context
     if do_bootstrapping:
         loss_boot = lam*gradncp.param_consistency(modulations, modulations_boot, batch_size)
-        print(loss_boot)
-        print(loss)
         loss = loss + loss_boot
 
     outputs = {

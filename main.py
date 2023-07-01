@@ -213,7 +213,7 @@ def add_arguments(parser):
       "--lam",
       help="bootstrapped loss weighting in overall loss",
       type=float,
-      default=100.
+      default=1.
     )
 
 

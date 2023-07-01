@@ -1,0 +1,79 @@
+{
+    "os": "Linux-5.15.107+-x86_64-with-glibc2.31",
+    "python": "3.10.12",
+    "heartbeatAt": "2023-07-01T18:25:35.079636",
+    "startedAt": "2023-07-01T18:25:24.390147",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "@configs/config_cifar10.txt"
+    ],
+    "state": "running",
+    "program": "/content/drive/MyDrive/DLLab/my_coinpp_gradncp/main.py",
+    "codePath": "main.py",
+    "git": {
+        "remote": "https://github.com/malcolmBurdorf/coinpp.git",
+        "commit": "5c8badf5b20b27c38ca400e10044f17e1c42748c"
+    },
+    "email": null,
+    "root": "/content/drive/MyDrive/DLLab/my_coinpp_gradncp",
+    "host": "5d9e72c686c5",
+    "username": "root",
+    "executable": "/usr/bin/python3",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2200.1379999999995,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2200.138,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "total": 225.83275985717773,
+        "used": 24.32217025756836
+    },
+    "memory": {
+        "total": 50.99732208251953
+    }
+}
