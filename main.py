@@ -174,6 +174,49 @@ def add_arguments(parser):
         default=-1,
     )
 
+    # GradNCP arguments
+    parser.add_argument(
+        "--do_sampling",
+        help="Whether to perform GradNCP sampling or not",
+        type=int,
+        default=0
+    )
+
+    parser.add_argument(
+        "--do_bootstrapping",
+        help="Whether to perform bootstrapping or not",
+        type=int,
+        default=0
+    )
+
+    parser.add_argument(
+        "--inner_step_boot",
+        help="Number of inner steps for bootstrapping (K)",
+        type=int,
+        default=3
+    )
+
+    parser.add_argument(
+        '--inner_lr_boot', 
+        type=float, 
+        default=1.e-2,
+        help='learning rate of inner gradients')
+
+    parser.add_argument(
+      "--data_ratio",
+      help="what percentage of context points to sample for gradncp",
+      type=float,
+      default=.5
+    )
+
+    parser.add_argument(
+      "--lam",
+      help="bootstrapped loss weighting in overall loss",
+      type=float,
+      default=100.
+    )
+
+
     # Wandb arguments
     parser.add_argument(
         "--use_wandb",

@@ -1,6 +1,6 @@
 import coinpp.conversion as conversion
 import coinpp.models as models
-import data.audio as audio
+#import data.audio as audio
 import data.era5 as era5
 import data.fastmri as fastmri
 import data.image as image

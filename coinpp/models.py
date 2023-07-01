@@ -126,7 +126,7 @@ class Siren(nn.Module):
             dim_in=dim_hidden, dim_out=dim_out, w0=w0, use_bias=use_bias, is_last=True
         )
 
-    def forward(self, x):
+    def forward(self, x, get_penult_features=False):
         """Forward pass of SIREN model.
 
         Args:
@@ -136,8 +136,11 @@ class Siren(nn.Module):
         Returns:
             Tensor of shape (*, dim_out).
         """
-        x = self.net(x)
-        return self.last_layer(x)
+        feature = self.net(x)
+        out = self.last_layer(feature)
+
+        return out, feature if get_penult_features else out
+
 
 
 class ModulatedSiren(Siren):

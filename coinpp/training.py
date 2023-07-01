@@ -96,6 +96,13 @@ class Trainer:
                 is_train=True,
                 return_reconstructions=False,
                 gradient_checkpointing=self.args.gradient_checkpointing,
+                do_sampling=self.args.do_sampling,
+                do_bootstrapping=self.args.do_bootstrapping,
+                inner_steps_boot=self.args.inner_step_boot,
+                inner_lr_boot=self.args.inner_lr_boot,
+                data_ratio=self.args.data_ratio,
+                lam=self.args.lam
+
             )
 
             # Update parameters of base network

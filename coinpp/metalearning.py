@@ -2,6 +2,12 @@ import coinpp.losses as losses
 import torch
 import torch.utils.checkpoint as cp
 
+# added imports
+import coinpp.gradncp as gradncp
+import torch.nn as nn
+import torch.nn.functional as F
+from einops import rearrange
+
 
 def inner_loop(
     func_rep,
@@ -12,6 +18,11 @@ def inner_loop(
     inner_lr,
     is_train=False,
     gradient_checkpointing=False,
+    do_sampling=False,
+    do_bootstrapping=False,
+    inner_steps_boot=3,
+    inner_lr_boot=5.e-2,
+    data_ratio=0.5
 ):
     """Performs inner loop, i.e. fits modulations such that the function
     representation can match the target features.
@@ -29,6 +40,31 @@ def inner_loop(
         gradient_checkpointing (bool): If True uses gradient checkpointing. This
             can massively reduce memory consumption.
     """
+    # Using full context set for bootstrapping
+    if do_bootstrapping:
+      coordinates_boot = coordinates
+      features_boot = features
+
+    # Perform GradNCP sampling 
+    if do_sampling == True:
+        
+        #gradncp samples the coordinates and also returns the sampling index (as in GradNCP code)
+        sampled_coordinates, sampled_index = gradncp.gradncp_sample(features, func_rep, data_ratio)
+        
+        # rearranging as done in wrapper.forward_image 
+        #(samples features along same index as sampled_coordinates)
+        features_tmp = rearrange(features, 'b h w c -> b c (h w)')
+        inputs = torch.gather(features_tmp, 2, sampled_index)
+
+        # making sampled_features the same dimensions as sampled_coordinates
+        sampled_features = rearrange(inputs, 'b c s -> b s c')
+        
+        # replace coordinates and features with sampled coordinates and features
+        coordinates = sampled_coordinates
+        features = sampled_features
+
+
+    # Start fitting the modulations
     fitted_modulations = modulations
     for step in range(inner_steps):
         if gradient_checkpointing:
@@ -52,8 +88,28 @@ def inner_loop(
                 is_train,
                 gradient_checkpointing,
             )
-    return fitted_modulations
+    
+    # Perform bootstrapping
+    if do_bootstrapping:
+        # copying the fitted modulations for bootstrapping
+        # .detach().clone() allows for the computation path to not be copied
+        fitted_modulations_boot = fitted_modulations.clone().detach().requires_grad_()
 
+        for step in range(inner_steps_boot):
+
+            fitted_modulations_boot = inner_loop_step(
+                func_rep,
+                fitted_modulations_boot,
+                coordinates_boot,
+                features_boot,
+                inner_lr_boot,
+                is_train=False,
+                gradient_checkpointing=False,
+            )
+            
+        return fitted_modulations, fitted_modulations_boot
+
+    return fitted_modulations, None
 
 def inner_loop_step(
     func_rep,
@@ -95,6 +151,12 @@ def outer_step(
     is_train=False,
     return_reconstructions=False,
     gradient_checkpointing=False,
+    do_sampling=False,
+    do_bootstrapping=False,
+    inner_steps_boot=3,
+    inner_lr_boot=5.e-2,
+    data_ratio=0.5,
+    lam=1.
 ):
     """
 
@@ -111,7 +173,7 @@ def outer_step(
     ).requires_grad_()
 
     # Run inner loop
-    modulations = inner_loop(
+    modulations, modulations_boot = inner_loop(
         func_rep,
         modulations_init,
         coordinates,
@@ -120,6 +182,10 @@ def outer_step(
         inner_lr,
         is_train,
         gradient_checkpointing,
+        do_sampling,
+        do_bootstrapping,
+        inner_steps_boot,
+        data_ratio
     )
 
     with torch.set_grad_enabled(is_train):
@@ -133,6 +199,13 @@ def outer_step(
         per_example_loss = losses.batch_mse_fn(features_recon, features)
         # Shape (1,)
         loss = per_example_loss.mean()
+
+    # Compute bootstrapping loss and add it to loss over pruned context
+    if do_bootstrapping:
+        loss_boot = lam*gradncp.param_consistency(modulations, modulations_boot, batch_size)
+        print(loss_boot)
+        print(loss)
+        loss = loss + loss_boot
 
     outputs = {
         "loss": loss,
